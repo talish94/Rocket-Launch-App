@@ -8,6 +8,16 @@
 
 import React from 'react';
 import { Text, View } from 'react-native';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+
+import Nav from './src/nav';
+import HomeScreen from './src/home';
+import UsersScreen from './src/user';
+// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from './src/utils/icons'; 
+
+const Tab = createMaterialBottomTabNavigator();
 
 
 const App = () => {
@@ -17,11 +27,49 @@ const App = () => {
     //     contentInsetAdjustmentBehavior="automatic"
     //     style={backgroundStyle}>
     //     <Header />
+    <>
         <View>
-             <Text>
+             <Nav nameOfApp="Rockets Launch App"/>
+           
+             {/* <Text>
                 Hello
-              </Text> 
-        </View>
+              </Text>  */}
+          </View>
+
+          <NavigationContainer>
+          <Tab.Navigator
+           initialRouteName="Home"
+           tabBarOptions={{
+            activeTintColor: '#e91e63',
+          }}
+          //  activeColor="#e91e63"
+           >
+
+              <Tab.Screen
+                  name="Home"
+                  component={HomeScreen}
+                  options={{
+                      tabBarLabel: 'Home',
+                      tabBarIcon: ({ color }) => (
+                        <Icon.MaterialCommunityIcons name="home" color={color} size={26} />
+                      ),
+                    }}
+                />
+                   {/* <Ionicons name={information-circle-outline} size={23} color={red} />; */}
+
+              <Tab.Screen
+              name="Settings"
+              component={UsersScreen}
+              options={{
+                tabBarLabel: 'Settings',
+                tabBarIcon: ({ color }) => (
+                  <Icon.MaterialCommunityIcons name="bell" color={color} size={26} />
+                ),
+              }}
+              />
+            </Tab.Navigator>
+          </NavigationContainer>
+        </>
     //   </ScrollView>
     // </SafeAreaView>
   );
