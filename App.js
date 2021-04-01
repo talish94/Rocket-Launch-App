@@ -1,44 +1,56 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
 
 import React from 'react';
 import { Text, View } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator, createAppContainer } from '@react-navigation/stack';
 
 import Nav from './src/nav';
 import HomeScreen from './src/home';
 import UsersScreen from './src/user';
+import Browser from './src/components/browser';
 // import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from './src/utils/icons'; 
 
 const Tab = createMaterialBottomTabNavigator();
 
+const HomeStack = createStackNavigator();
+
+function HomeStackScreen() {
+  return (
+    <HomeStack.Navigator>
+        <HomeStack.Screen name="Home" component={HomeScreen}/>
+        <HomeStack.Screen name="Browser" component={Browser}/>
+    </HomeStack.Navigator>
+  )
+}
+
+//   Home: {
+//     screen: HomeScreen,
+//     navigationOptions: ({ navigation }) => ({
+//       title: 'HomeScreen',
+//       headerTintColor: 'blue'
+//     })
+//   },
+//   // Browser: {
+//   //   screen: Browser,
+//   //   navigationOptions: ({ navigation }) => ({
+//   //     title: navigation.state.params.title,
+//   //     headerTintColor: 'green'
+//   //   })
+//   //}
+// })
 
 const App = () => {
   return (
-    // <SafeAreaView style={backgroundStyle}>
-    //   <ScrollView
-    //     contentInsetAdjustmentBehavior="automatic"
-    //     style={backgroundStyle}>
-    //     <Header />
     <>
         <View>
              <Nav nameOfApp="Rockets Launch App"/>
-           
-             {/* <Text>
-                Hello
-              </Text>  */}
           </View>
 
           <NavigationContainer>
           <Tab.Navigator
-           initialRouteName="Home"
+           initialRouteName="HomeStackScreen"
            tabBarOptions={{
             activeTintColor: '#e91e63',
           }}
@@ -46,8 +58,8 @@ const App = () => {
            >
 
               <Tab.Screen
-                  name="Home"
-                  component={HomeScreen}
+                  name="HomeStackScreen"
+                  component={HomeStackScreen}
                   options={{
                       tabBarLabel: 'Home',
                       tabBarIcon: ({ color }) => (
@@ -57,7 +69,7 @@ const App = () => {
                 />
                    {/* <Ionicons name={information-circle-outline} size={23} color={red} />; */}
 
-              <Tab.Screen
+              {/* <Tab.Screen
               name="Settings"
               component={UsersScreen}
               options={{
@@ -66,12 +78,10 @@ const App = () => {
                   <Icon.MaterialCommunityIcons name="bell" color={color} size={26} />
                 ),
               }}
-              />
+              /> */}
             </Tab.Navigator>
           </NavigationContainer>
         </>
-    //   </ScrollView>
-    // </SafeAreaView>
   );
 };
 

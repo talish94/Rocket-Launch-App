@@ -1,10 +1,13 @@
+// import { useNavigation } from '@react-navigation/core';
 import React, {Component} from 'react';
 import {ActivityIndicator, FlatList, Text, View, Image, StyleSheet} from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { WebView } from 'react-native-webview';
+import { useNavigation } from '@react-navigation/native';
 
 
-export default class App extends Component {
+class HomeScreen extends Component {
   constructor(props) {
     super(props);
 
@@ -12,6 +15,12 @@ export default class App extends Component {
       data: [],
       nextUrl: "",
       loading: true,
+      // showWebView: false,
+
+      // links: [
+      //   { title: 'JScrambler Blog', link: 'https://blog.jscrambler.com' },
+      //   { title: 'My Portfolio', link: 'https://amanhimself.dev' }
+      // ]
     };
   }
 
@@ -35,49 +44,83 @@ export default class App extends Component {
     this.setState(() => { return {data: this.state.data.concat(json.results), nextUrl: json.next, loading: false}});
   };
 
+  openWebView = (item) => {
+    console.log('Navigation router run...');
+    // this.setState(() => { return { showWebView: true }});
+
+    // const { name, link } = item;
+    const title = "google";
+    const link = "www.google.com";
+    this.props.navigation.navigate('Browser', { title , link });
+
+    // <WebView 
+    //             source={{ uri: 'https://www.google.com' }}
+    //             style={{ marginTop: 0, marginLeft: -95, height: 300 , width: '150%', flex: 1 }}
+    //         />
+  };
+
+
 
   Item = ({ item}) => {
-    const date = item.window_start.substring(0, item.window_start.indexOf("T"));
+    // const date = item.window_start.substring(0, item.window_start.indexOf("T"));
     // console.log(item);
-    const country = item.pad.location.country_code;
-    const isSuccess = item.status.abbrev;
+    // const country = item.pad.location.country_code;
+    // const isSuccess = item.status.abbrev;
     // console.log(this.state.nextUrl);
 
+    const { navigation } = this.props;
+
+
     return (
-        <ListItem key={item.id} bottomDivider>
-                <Avatar style={styles.image} source={{uri: item.image}} />
+        <ListItem key={item.id} bottomDivider button onPress={() => {navigation.navigate('HomeStackScreen' , {
+          screen: 'Browser',
+          params: { url: "www.google.com"}
+        })}}>
+            {
+                item.image != null
+                ?  <Avatar style={styles.image} source={{uri: item.image}} />
+                :  <Avatar style={styles.image} source={require('../src/assets/launch.jpg')} />
+            }
                 <ListItem.Content>
                 <ListItem.Title style={styles.title} >{item.name}</ListItem.Title>
                 <Icon style={styles.heartIcon} name="heart" size={22}  />
-                <ListItem.Subtitle style={styles.first}>{country}</ListItem.Subtitle>
-                <ListItem.Subtitle style={styles.second}>{date}</ListItem.Subtitle>
+                <ListItem.Subtitle style={styles.first}>{item.pad.location.country_code}</ListItem.Subtitle>
+                <ListItem.Subtitle style={styles.second}>{item.window_start.substring(0, item.window_start.indexOf("T"))}</ListItem.Subtitle>
 
-                { isSuccess === "Success" &&
+                { item.status.abbrev === "Success" &&
                     <ListItem.Subtitle style={styles.successGreen} >
-                        {isSuccess}
+                        {item.status.abbrev}
                     </ListItem.Subtitle>
                 }
-                { isSuccess === "Failure" &&
+                { item.status.abbrev === "Failure" &&
                     <ListItem.Subtitle style={styles.successRed} >
-                        {isSuccess}
+                        {item.status.abbrev}
                     </ListItem.Subtitle>
                 }
-                  { isSuccess === "Partial Failure" &&
+                  { item.status.abbrev === "Partial Failure" &&
                     <ListItem.Subtitle style={styles.successMid} >
-                        {isSuccess}
+                        {item.status.abbrev}
                     </ListItem.Subtitle>
                 }
                 </ListItem.Content>
         </ListItem>
     )
-}
+  }
 
   render() {
-    console.log(this.state.nextUrl);
+    // console.log(this.state.showWebView);
+
+    // const navigation = this.props;
 
     return (
         <>
-
+        {/* {this.state.showWebView &&
+         <WebView 
+          source={{ uri: 'https://www.google.com' }}
+            style={{ marginTop: 0, marginLeft: -95, height: 300 , width: '150%', flex: 1 }}
+          />
+      }
+  */}
         { this.state.data  &&
         
         <FlatList
@@ -107,6 +150,14 @@ export default class App extends Component {
  
   }
 }
+
+
+export default function (props) {
+  const navigation = useNavigation();
+
+  return <HomeScreen {...props} navigation={navigation}/>
+}
+
 
 const styles = StyleSheet.create({
   sectionContainer: {
