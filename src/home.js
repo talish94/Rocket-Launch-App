@@ -4,6 +4,7 @@ import { ListItem, Avatar } from 'react-native-elements'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from '@react-navigation/native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -53,6 +54,18 @@ class HomeScreen extends Component {
   };
 
 
+  storeData = async (launch) => {
+    try {
+      const jsonLaunch = JSON.stringify(launch);
+      await AsyncStorage.setItem(launch.id, jsonLaunch);
+      console.log("launch was saved to store :: " + launch.name);
+    } catch (e) {
+      // saving error
+      alert("There was an error saving this launch to your favourites.");
+    }
+  }
+
+
   Item = ({ item}) => {
 
     // console.log(item);
@@ -74,7 +87,9 @@ class HomeScreen extends Component {
             }
                 <ListItem.Content>
                 <ListItem.Title style={styles.title} >{item.name}</ListItem.Title>
-                <Icon style={styles.heartIcon} name="heart-outline" size={22}  />
+                <Icon style={styles.heartIcon} name="heart-outline" size={22} 
+                 button onPress={() => {this.storeData(item)}} />
+
                 <ListItem.Subtitle style={styles.first}>{item.pad.location.country_code}</ListItem.Subtitle>
                 <ListItem.Subtitle style={styles.second}>{item.window_start.substring(0, item.window_start.indexOf("T"))}</ListItem.Subtitle>
 
