@@ -7,7 +7,7 @@ import { createStackNavigator, createAppContainer } from '@react-navigation/stac
 
 import Nav from './src/nav';
 import HomeScreen from './src/home';
-import UsersScreen from './src/user';
+import Favorites from './src/favorites';
 import Browser from './src/components/browser';
 // import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from './src/utils/icons'; 
@@ -25,6 +25,19 @@ function HomeStackScreen() {
   )
 }
 
+
+const FavoritesStack = createStackNavigator();
+
+function FavoritesStackScreen() {
+  return (
+    <FavoritesStack.Navigator>
+        <FavoritesStack.Screen name="Home" component={Favorites}/>
+        <FavoritesStack.Screen name="Browser" component={Browser}/>
+    </FavoritesStack.Navigator>
+  )
+}
+
+
 const App = () => {
   return (
     <>
@@ -34,11 +47,7 @@ const App = () => {
 
           <NavigationContainer>
           <Tab.Navigator
-           initialRouteName="HomeStackScreen"
-           tabBarOptions={{
-            activeTintColor: '#e91e63',
-          }}
-          //  activeColor="#e91e63"
+                    barStyle={{ backgroundColor: '#4d79ff' }}
            >
 
               <Tab.Screen
@@ -47,19 +56,19 @@ const App = () => {
                   options={{
                       tabBarLabel: 'Home',
                       tabBarIcon: ({ color }) => (
-                        <Icon.MaterialCommunityIcons name="home" color={color} size={26} />
+                        <Icon.MaterialCommunityIcons name="home" color={color} size={28} />
                       ),
                     }}
                 />
                    {/* <Ionicons name={information-circle-outline} size={23} color={red} />; */}
 
               <Tab.Screen
-              name="Settings"
-              component={UsersScreen}
+              name="FavoritesStackScreen"
+              component={FavoritesStackScreen}
               options={{
-                tabBarLabel: 'Settings',
+                tabBarLabel: 'Favorites',
                 tabBarIcon: ({ color }) => (
-                  <Icon.MaterialCommunityIcons name="bell" color={color} size={26} />
+                  <Icon.AntDesign name="heart" color={color} size={20} />
                 ),
               }}
               />

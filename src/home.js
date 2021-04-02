@@ -1,4 +1,3 @@
-// import { useNavigation } from '@react-navigation/core';
 import React, {Component} from 'react';
 import {ActivityIndicator, FlatList, Text, View, Image, StyleSheet} from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements'
@@ -14,7 +13,6 @@ class HomeScreen extends Component {
       data: [],
       nextUrl: "",
       loading: true,
-
     };
   }
 
@@ -28,6 +26,7 @@ class HomeScreen extends Component {
     this.setState(() => { return {data: json.results, nextUrl: json.next, loading: false}});
   }
 
+
   fetchData = async () => {
     this.setState(() => { return { loading: true }});
     const response = await fetch(
@@ -37,6 +36,7 @@ class HomeScreen extends Component {
     // console.log(json.next);
     this.setState(() => { return {data: this.state.data.concat(json.results), nextUrl: json.next, loading: false}});
   };
+
 
   openWebView = (item) => {
     console.log('Navigation router run...');
@@ -53,15 +53,14 @@ class HomeScreen extends Component {
   };
 
 
-
   Item = ({ item}) => {
+
     // console.log(item);
     // console.log(this.state.nextUrl);
 
     const { navigation } = this.props;
 
     //const { title, urlSource } = this.openWebView(item);
-
 
     return (
         <ListItem key={item.id} bottomDivider button onPress={() => {navigation.navigate('HomeStackScreen' , {
@@ -75,7 +74,7 @@ class HomeScreen extends Component {
             }
                 <ListItem.Content>
                 <ListItem.Title style={styles.title} >{item.name}</ListItem.Title>
-                <Icon style={styles.heartIcon} name="heart" size={22}  />
+                <Icon style={styles.heartIcon} name="heart-outline" size={22}  />
                 <ListItem.Subtitle style={styles.first}>{item.pad.location.country_code}</ListItem.Subtitle>
                 <ListItem.Subtitle style={styles.second}>{item.window_start.substring(0, item.window_start.indexOf("T"))}</ListItem.Subtitle>
 
@@ -100,19 +99,9 @@ class HomeScreen extends Component {
   }
 
   render() {
-    // console.log(this.state.showWebView);
-
-    // const navigation = this.props;
 
     return (
         <>
-        {/* {this.state.showWebView &&
-         <WebView 
-          source={{ uri: 'https://www.google.com' }}
-            style={{ marginTop: 0, marginLeft: -95, height: 300 , width: '150%', flex: 1 }}
-          />
-      }
-  */}
         { this.state.data  &&
         
         <FlatList
@@ -189,6 +178,7 @@ image: {
     fontSize: 18,
     color: 'green',
     marginTop: -12,
+    marginBottom: -8
   },
   successRed: {
     alignSelf: "flex-end",
@@ -197,6 +187,7 @@ image: {
     fontSize: 18,
     color: 'red',
     marginTop: -12,
+    marginBottom: -8
   },
   successMid: {
     alignSelf: "flex-end",
@@ -205,6 +196,7 @@ image: {
     fontSize: 18,
     color: 'orange',
     marginTop: -12,
+    marginBottom: -8
   },
   container: {
     flex: 1,

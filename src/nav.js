@@ -10,7 +10,7 @@ const Nav = ({nameOfApp}) => (
 
 const styles = StyleSheet.create({
     nav:{
-        backgroundColor: '#809fff',
+        backgroundColor: '#83a1fb',
         alignItems: 'center',
         padding: 20,
         width: '100%',
