@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const HomeScreen = (props) => {
+const HomeScreen = () => {
 
   const navigation = useNavigation();
   const [data, setData] = useState([]);
@@ -27,6 +27,7 @@ const HomeScreen = (props) => {
      setNextUrl(json.next);
      setLoading(false);
    };
+   
     fetchData();
   }, []);
 
@@ -146,6 +147,7 @@ const HomeScreen = (props) => {
 }
 
 export default HomeScreen;
+
 
 
 
