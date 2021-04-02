@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, FlatList, Text, View, Image, StyleSheet} from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -6,40 +6,44 @@ import { useNavigation } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-class HomeScreen extends Component {
-  constructor(props) {
-    super(props);
+const HomeScreen = (props) => {
 
-    this.state = {
-      data: [],
-      nextUrl: "",
-      loading: true,
-    };
-  }
+  const navigation = useNavigation();
+  const [data, setData] = useState([]);
+  const [nextUrl, setNextUrl] = useState("");
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+
+    const fetchData = async () => {
+
+      setLoading(true);
+     const response = await fetch(
+       'https://lldev.thespacedevs.com/2.2.0/launch/?mode=list?limit=10&offset=0',
+     );
+     const json = await response.json();
   
-  async componentDidMount() {
-        this.setState(() => { return { loading: true }});
-        const response = await fetch(
-      'https://lldev.thespacedevs.com/2.2.0/launch/?mode=list?limit=10&offset=0',
-    );
-    const json = await response.json();
-    this.setState(() => { return {data: json.results, nextUrl: json.next, loading: false}});
-  }
+     setData(json.results);
+     setNextUrl(json.next);
+     setLoading(false);
+   };
+    fetchData();
+  }, []);
 
 
-  fetchData = async () => {
-    this.setState(() => { return { loading: true }});
-    const response = await fetch(
-      this.state.nextUrl,
-    );
+  const fetchMoreData = async () => {
+    setLoading(true);
+    const response = await fetch( nextUrl );
     const json = await response.json();
     // console.log(json.next);
-    this.setState(() => { return {data: this.state.data.concat(json.results), nextUrl: json.next, loading: false}});
+
+    setData(data.concat(json.results));
+    setNextUrl(json.next);
+    setLoading(false);
+
   };
 
-
-  openWebView = (item) => {
+  const openWebView = (item) => {
     console.log('Navigation router run...');
 
     const title = item.name;
@@ -54,7 +58,7 @@ class HomeScreen extends Component {
   };
 
 
-  storeData = async (launch) => {
+  const storeData = async (launch) => {
     try {
       const jsonLaunch = JSON.stringify(launch);
       await AsyncStorage.setItem(launch.id, jsonLaunch);
@@ -66,12 +70,12 @@ class HomeScreen extends Component {
   }
 
 
-  Item = ({ item}) => {
+  const Item = ({ item}) => {
 
     // console.log(item);
     // console.log(this.state.nextUrl);
 
-    const { navigation } = this.props;
+    // const { navigation } = props;
 
     //const { title, urlSource } = this.openWebView(item);
 
@@ -88,7 +92,7 @@ class HomeScreen extends Component {
                 <ListItem.Content>
                 <ListItem.Title style={styles.title} >{item.name}</ListItem.Title>
                 <Icon style={styles.heartIcon} name="heart-outline" size={22} 
-                 button onPress={() => {this.storeData(item)}} />
+                 button onPress={() => {storeData(item)}} />
 
                 <ListItem.Subtitle style={styles.first}>{item.pad.location.country_code}</ListItem.Subtitle>
                 <ListItem.Subtitle style={styles.second}>{item.window_start.substring(0, item.window_start.indexOf("T"))}</ListItem.Subtitle>
@@ -113,46 +117,36 @@ class HomeScreen extends Component {
     )
   }
 
-  render() {
 
-    return (
-        <>
-        { this.state.data  &&
-        
-        <FlatList
-            contentContainerStyle={styles.sectionContainer}
-            data={this.state.data}
-            renderItem={this.Item}
+  return (
+    <>
+    { data  &&
+    
+    <FlatList
+        contentContainerStyle={styles.sectionContainer}
+        data={data}
+        renderItem={Item}
 
-            // renderItem={({ item }) =>
-            //     <LaunchItem item={item} />
-            // }
+        // renderItem={({ item }) =>
+        //     <LaunchItem item={item} />
+        // }
 
-            keyExtractor={(item, index) => String(index)}
-            onEndReached={this.fetchData}
-            onEndReachedThreshold={0.1}            
-            initialNumToRender={10}
-            ListFooterComponent={() =>
-                this.state.loading
-                  ?        
-                              <ActivityIndicator size="large" color="#809fff" animating />
-                  : null
-                }
+        keyExtractor={(item, index) => String(index)}
+        onEndReached={fetchMoreData}
+        onEndReachedThreshold={0.1}            
+        initialNumToRender={10}
+        ListFooterComponent={() =>
+            loading ? <ActivityIndicator size="large" color="#809fff" animating />
+                    : null
+            }
         />
-
         }
-        </>
+      </>
     );
- 
-  }
 }
 
+export default HomeScreen;
 
-export default function (props) {
-  const navigation = useNavigation();
-
-  return <HomeScreen {...props} navigation={navigation}/>
-}
 
 
 const styles = StyleSheet.create({
