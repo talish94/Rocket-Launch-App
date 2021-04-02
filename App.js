@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, createAppContainer } from '@react-navigation/stack';
@@ -24,22 +24,6 @@ function HomeStackScreen() {
     </HomeStack.Navigator>
   )
 }
-
-//   Home: {
-//     screen: HomeScreen,
-//     navigationOptions: ({ navigation }) => ({
-//       title: 'HomeScreen',
-//       headerTintColor: 'blue'
-//     })
-//   },
-//   // Browser: {
-//   //   screen: Browser,
-//   //   navigationOptions: ({ navigation }) => ({
-//   //     title: navigation.state.params.title,
-//   //     headerTintColor: 'green'
-//   //   })
-//   //}
-// })
 
 const App = () => {
   return (
@@ -69,7 +53,7 @@ const App = () => {
                 />
                    {/* <Ionicons name={information-circle-outline} size={23} color={red} />; */}
 
-              {/* <Tab.Screen
+              <Tab.Screen
               name="Settings"
               component={UsersScreen}
               options={{
@@ -78,30 +62,30 @@ const App = () => {
                   <Icon.MaterialCommunityIcons name="bell" color={color} size={26} />
                 ),
               }}
-              /> */}
+              />
             </Tab.Navigator>
           </NavigationContainer>
         </>
   );
 };
 
-// const styles = StyleSheet.create({
-//   sectionContainer: {
-//     marginTop: 32,
-//     paddingHorizontal: 24,
-//   },
-//   sectionTitle: {
-//     fontSize: 24,
-//     fontWeight: '600',
-//   },
-//   sectionDescription: {
-//     marginTop: 8,
-//     fontSize: 18,
-//     fontWeight: '400',
-//   },
-//   highlight: {
-//     fontWeight: '700',
-//   },
-// });
+const styles = StyleSheet.create({
+  sectionContainer: {
+    marginTop: 32,
+    paddingHorizontal: 24,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+  },
+  sectionDescription: {
+    marginTop: 8,
+    fontSize: 18,
+    fontWeight: '400',
+  },
+  highlight: {
+    fontWeight: '700',
+  },
+});
 
 export default App;

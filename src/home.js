@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import {ActivityIndicator, FlatList, Text, View, Image, StyleSheet} from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 
 
@@ -15,12 +14,7 @@ class HomeScreen extends Component {
       data: [],
       nextUrl: "",
       loading: true,
-      // showWebView: false,
 
-      // links: [
-      //   { title: 'JScrambler Blog', link: 'https://blog.jscrambler.com' },
-      //   { title: 'My Portfolio', link: 'https://amanhimself.dev' }
-      // ]
     };
   }
 
@@ -46,35 +40,33 @@ class HomeScreen extends Component {
 
   openWebView = (item) => {
     console.log('Navigation router run...');
-    // this.setState(() => { return { showWebView: true }});
 
-    // const { name, link } = item;
-    const title = "google";
+    const title = item.name;
+
+    const infoUrl = item.pad.info_url;
+    if ( infoUrl != null )
+      return { title, infoUrl };
+
+    // if ( )
     const link = "www.google.com";
-    this.props.navigation.navigate('Browser', { title , link });
-
-    // <WebView 
-    //             source={{ uri: 'https://www.google.com' }}
-    //             style={{ marginTop: 0, marginLeft: -95, height: 300 , width: '150%', flex: 1 }}
-    //         />
+    // this.props.navigation.navigate('Browser', { title , link });
   };
 
 
 
   Item = ({ item}) => {
-    // const date = item.window_start.substring(0, item.window_start.indexOf("T"));
     // console.log(item);
-    // const country = item.pad.location.country_code;
-    // const isSuccess = item.status.abbrev;
     // console.log(this.state.nextUrl);
 
     const { navigation } = this.props;
+
+    //const { title, urlSource } = this.openWebView(item);
 
 
     return (
         <ListItem key={item.id} bottomDivider button onPress={() => {navigation.navigate('HomeStackScreen' , {
           screen: 'Browser',
-          params: { url: "www.google.com"}
+          params: { url: 'https://www.google.com' }
         })}}>
             {
                 item.image != null
