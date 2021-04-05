@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, FlatList, Text, View, Image, StyleSheet} from 'react-native';
+import {ActivityIndicator, SafeAreaView, FlatList, Text, View, Image, StyleSheet} from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from '@react-navigation/native';
@@ -71,76 +71,72 @@ const HomeScreen = () => {
   }
 
 
-  const Item = ({ item}) => {
+  const Item = ({ item, onPress }) => (
 
-    // console.log(item);
-    // console.log(this.state.nextUrl);
+    <ListItem key={item.id} bottomDivider button onPress={onPress}>
+                {
+                    item.image != null
+                    ?  <Avatar style={styles.image} source={{uri: item.image}} />
+                    :  <Avatar style={styles.image} source={require('../src/assets/launch.jpg')} />
+                }
+                    <ListItem.Content>
+                    <ListItem.Title style={styles.title} >{item.name}</ListItem.Title>
+                    <Icon style={styles.starIcon} name="star-outline" size={26} 
+                     button onPress={() => {storeData(item)}} />
+    
+                    <ListItem.Subtitle style={styles.first}>{item.pad.location.country_code}</ListItem.Subtitle>
+                    <ListItem.Subtitle style={styles.second}>{item.window_start.substring(0, item.window_start.indexOf("T"))}</ListItem.Subtitle>
+    
+                    { item.status.abbrev === "Success" &&
+                        <ListItem.Subtitle style={styles.successGreen} >
+                            {item.status.abbrev}
+                        </ListItem.Subtitle>
+                    }
+                    { item.status.abbrev === "Failure" &&
+                        <ListItem.Subtitle style={styles.successRed} >
+                            {item.status.abbrev}
+                        </ListItem.Subtitle>
+                    }
+                      { item.status.abbrev === "Partial Failure" &&
+                        <ListItem.Subtitle style={styles.successMid} >
+                            {item.status.abbrev}
+                        </ListItem.Subtitle>
+                    }
+                    </ListItem.Content>
+            </ListItem>
+  );
 
-    // const { navigation } = props;
 
-    //const { title, urlSource } = this.openWebView(item);
+  const renderItem = ({ item }) => {
 
     return (
-        <ListItem key={item.id} bottomDivider button onPress={() => {navigation.navigate('HomeStackScreen' , {
-          screen: 'Browser',
-          params: { url: 'https://www.google.com' }
-        })}}>
-            {
-                item.image != null
-                ?  <Avatar style={styles.image} source={{uri: item.image}} />
-                :  <Avatar style={styles.image} source={require('../src/assets/launch.jpg')} />
-            }
-                <ListItem.Content>
-                <ListItem.Title style={styles.title} >{item.name}</ListItem.Title>
-                <Icon style={styles.heartIcon} name="heart-outline" size={22} 
-                 button onPress={() => {storeData(item)}} />
-
-                <ListItem.Subtitle style={styles.first}>{item.pad.location.country_code}</ListItem.Subtitle>
-                <ListItem.Subtitle style={styles.second}>{item.window_start.substring(0, item.window_start.indexOf("T"))}</ListItem.Subtitle>
-
-                { item.status.abbrev === "Success" &&
-                    <ListItem.Subtitle style={styles.successGreen} >
-                        {item.status.abbrev}
-                    </ListItem.Subtitle>
-                }
-                { item.status.abbrev === "Failure" &&
-                    <ListItem.Subtitle style={styles.successRed} >
-                        {item.status.abbrev}
-                    </ListItem.Subtitle>
-                }
-                  { item.status.abbrev === "Partial Failure" &&
-                    <ListItem.Subtitle style={styles.successMid} >
-                        {item.status.abbrev}
-                    </ListItem.Subtitle>
-                }
-                </ListItem.Content>
-        </ListItem>
-    )
-  }
+      <Item
+        item={item}
+        onPress={() => console.log(item.id)}
+      />
+    );
+  };
 
 
   return (
     <>
     { data  &&
-    
-    <FlatList
-        contentContainerStyle={styles.sectionContainer}
-        data={data}
-        renderItem={Item}
+        <SafeAreaView style={styles.container}>
 
-        // renderItem={({ item }) =>
-        //     <LaunchItem item={item} />
-        // }
-
-        keyExtractor={(item, index) => String(index)}
-        onEndReached={fetchMoreData}
-        onEndReachedThreshold={0.1}            
-        initialNumToRender={10}
-        ListFooterComponent={() =>
-            loading ? <ActivityIndicator size="large" color="#809fff" animating />
-                    : null
-            }
-        />
+          <FlatList
+                  contentContainerStyle={styles.sectionContainer}
+                  data={data}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => item.id}
+                  onEndReached={fetchMoreData}
+                  onEndReachedThreshold={0.1}            
+                  initialNumToRender={10}
+                  ListFooterComponent={() =>
+                      loading ? <ActivityIndicator size="large" color="#809fff" animating />
+                              : null
+                      }
+                />
+        </SafeAreaView>
         }
       </>
     );
@@ -175,16 +171,16 @@ image: {
     fontSize: 16,
     fontWeight: '200',
   },
-  heartIcon: {
-    color: "#d9596c",
+  starIcon: {
+    color: "#fcba03",
     alignSelf: "flex-end",
-    marginRight: 10,
+    marginRight: 6,
     marginBottom: -10,
     marginTop: 8,
   },
   successGreen: {
     alignSelf: "flex-end",
-    marginRight: 30,
+    marginRight: 10,
     fontWeight: '700',
     fontSize: 18,
     color: 'green',
@@ -193,7 +189,7 @@ image: {
   },
   successRed: {
     alignSelf: "flex-end",
-    marginRight: 30,
+    marginRight: 10,
     fontWeight: '700',
     fontSize: 18,
     color: 'red',
@@ -202,7 +198,7 @@ image: {
   },
   successMid: {
     alignSelf: "flex-end",
-    marginRight: 30,
+    marginRight: 10,
     fontWeight: '700',
     fontSize: 18,
     color: 'orange',
