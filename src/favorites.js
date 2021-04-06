@@ -5,6 +5,7 @@ import { ListItem, Avatar } from 'react-native-elements'
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LaunchItem from '../src/components/launchItem';
 
 const Favorites  = () => {
 
@@ -17,9 +18,7 @@ const Favorites  = () => {
 
     const getAllKeys = async () => {
 
-      //await AsyncStorage.clear();
-
-      setLoading(true);
+       //await AsyncStorage.clear();
 
       let launchesIds = [];
       let launchObject = null;
@@ -35,11 +34,10 @@ const Favorites  = () => {
             allLaunchesObjects.push(launchObject);
           }
        
-  
-        setLaunches(allLaunchesObjects);
-        setLoading(false);
 
-         console.log("enddd" + launches.length);
+        setLaunches(allLaunchesObjects);
+
+        //console.log("enddd" + launches.length);
         
 
       } catch(e) {
@@ -51,7 +49,7 @@ const Favorites  = () => {
       // example console.log result:
       // ['@MyApp_user', '@MyApp_key']
    
-      getAllKeys();
+      const refresh = setInterval(getAllKeys, 2000);
       //console.log(launches.length);
 
   }, []);
@@ -73,43 +71,11 @@ const Favorites  = () => {
   
     const renderItem = ({ item }) => {
 
+      const isFavorite = (launches.find( launch => launch.id == item.id )) != null;
+      //console.log(isFavorite);
+
       return (
-              <ListItem key={item.id} bottomDivider button onPress={() => {navigation.navigate('FavoritesStack' , {
-          screen: 'Browser',
-          params: { url: 'https://www.google.com' }
-        })}}>
-
-            {
-                item.image != null
-                ?  <Avatar style={styles.image} source={{uri: item.image}} />
-                :  <Avatar style={styles.image} source={require('../src/assets/launch.jpg')} />
-            }
-                <ListItem.Content>
-                <ListItem.Title style={styles.title} >{item.name}</ListItem.Title>
-                <Icon style={styles.starIcon} name="star" size={26}  />
-
-                {/* //  button onPress={() => {removeFromFavorites(item)}} /> */}
-
-                <ListItem.Subtitle style={styles.first}>{item.pad.location.country_code}</ListItem.Subtitle>
-                <ListItem.Subtitle style={styles.second}>{item.window_start.substring(0, item.window_start.indexOf("T"))}</ListItem.Subtitle>
-
-                { item.status.abbrev === "Success" &&
-                    <ListItem.Subtitle style={styles.successGreen} >
-                        {item.status.abbrev}
-                    </ListItem.Subtitle>
-                }
-                { item.status.abbrev === "Failure" &&
-                    <ListItem.Subtitle style={styles.successRed} >
-                        {item.status.abbrev}
-                    </ListItem.Subtitle>
-                }
-                  { item.status.abbrev === "Partial Failure" &&
-                    <ListItem.Subtitle style={styles.successMid} >
-                        {item.status.abbrev}
-                    </ListItem.Subtitle>
-                }
-                </ListItem.Content>
-        </ListItem>
+            <LaunchItem item={item} isFavorite={isFavorite} renderItem={renderItem} />
       );
     };
 
