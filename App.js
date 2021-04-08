@@ -1,15 +1,13 @@
-
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, createAppContainer } from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import Nav from './src/nav';
 import HomeScreen from './src/home';
 import Favorites from './src/favorites';
 import Browser from './src/components/browser';
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from './src/utils/icons'; 
 
 const Tab = createMaterialBottomTabNavigator();
@@ -60,7 +58,6 @@ const App = () => {
                       ),
                     }}
                 />
-                   {/* <Ionicons name={information-circle-outline} size={23} color={red} />; */}
 
               <Tab.Screen
               name="FavoritesStackScreen"
@@ -68,7 +65,7 @@ const App = () => {
               options={{
                 tabBarLabel: 'Favorites',
                 tabBarIcon: ({ color }) => (
-                  <Icon.AntDesign name="heart" color={color} size={20} />
+                  <Icon.MaterialCommunityIcons name="star" color={color} size={27} />
                 ),
               }}
               />
@@ -78,23 +75,5 @@ const App = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;

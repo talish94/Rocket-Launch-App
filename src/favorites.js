@@ -1,169 +1,127 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ActivityIndicator, Text, View, FlatList, StyleSheet } from 'react-native';
+import { SafeAreaView, ActivityIndicator, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { ListItem, Avatar } from 'react-native-elements'
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LaunchItem from '../src/components/launchItem';
 
 const Favorites  = () => {
 
-  const [launches, setLaunches] = useState([]);
+  const [favoriteLaunches, setFavoriteLaunches] = useState([]);
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
 
 
+  // this function calls only on the first time ( ~componentDidMount )
   useEffect(() => {
 
-    const getAllKeys = async () => {
+    let mounted = true;
 
-       //await AsyncStorage.clear();
+        setLoading(true);
+        getAllLaunches();
 
-      let launchesIds = [];
-      let launchObject = null;
-      let allLaunchesObjects = [];
-  
-       try {
-        launchesIds = await AsyncStorage.getAllKeys();
-        //console.log(launchesIds.length);
-
-        // launchesIds.forEach( async(id)=> {
-          for (let id of launchesIds) {
-            launchObject = await getData(id);
-            allLaunchesObjects.push(launchObject);
-          }
-       
-
-        setLaunches(allLaunchesObjects);
-
-        //console.log("enddd" + launches.length);
-        
-
-      } catch(e) {
-        // read key error
-        console.log("eroorrrr");
-      }
-    };
-  
-      // example console.log result:
-      // ['@MyApp_user', '@MyApp_key']
-   
-      const refresh = setInterval(getAllKeys, 2000);
-      //console.log(launches.length);
-
+      return () => mounted = false;
   }, []);
 
 
+  // this function calls every time the dependency changes (favoriteLaunches).
+  useEffect(() => {
 
+    let mounted = true;
+
+    setLoading(true);
+    getAllLaunches();
+
+    setLoading(false);
+    return () => mounted = false;
+
+  }, [favoriteLaunches]);
+
+
+  // this function gets all the keys from the asyncStorage, to load the favorites launches to display
+  const getAllLaunches = async () => {
+
+    let launchesIds = [];
+    let launchObject = null;
+    let allLaunchesObjects = [];
+
+    try {
+
+      launchesIds = await AsyncStorage.getAllKeys();
+
+        for (let id of launchesIds) {
+          launchObject = await getData(id);
+          allLaunchesObjects.push(launchObject);
+        }
+    
+        // updates the new list
+        setFavoriteLaunches(allLaunchesObjects);
+    
+    } catch(error) {
+      console.log(error);
+    }
+  };
+
+
+  // this function gets the whole information about the launch, by the given ID
   const getData = async (launchKey) => {
     try {
       const jsonValue = await AsyncStorage.getItem(launchKey);
 
       return jsonValue != null ? JSON.parse(jsonValue) : null;
 
-    } catch(e) {
-      // error reading value
+    } catch(error) {
+        console.log(error);
     }
   }
 
- 
+
+  // gets updated list of favorite launches from the child component
+  const launchesListUpdated = ( newLaunches ) => {
+    console.log ( newLaunches.length );
+    setFavoriteLaunches(newLaunches);
+  }
+
   
-    const renderItem = ({ item }) => {
+  const renderItem = ({ item }) => {
 
-      const isFavorite = (launches.find( launch => launch.id == item.id )) != null;
-      //console.log(isFavorite);
+    let isFavorite = false;
+    let infoUrl = null;
 
-      return (
-            <LaunchItem item={item} isFavorite={isFavorite} renderItem={renderItem} />
-      );
-    };
+    if (item != null) {
 
+      // checks whether it is a favorite launch or not - to display the correct icon.
+      isFavorite = (favoriteLaunches.find( currLaunch => currLaunch.id == item.id )) !== null;
 
+      infoUrl = item.program.wiki_url;
+
+      if ( infoUrl === "" ){
+          infoUrl = item.pad.wiki_url;
+      }
+    }
+
+    return (
+          <LaunchItem launch={item} isFavorite={isFavorite} navigation={navigation} uri={infoUrl} launchesListUpdated={launchesListUpdated}/>
+    );
+  };
 
 
   return (
     <>
-    <SafeAreaView style={styles.sectionContainer}>
+    <SafeAreaView >
       <FlatList
-        data={launches}
+        data={favoriteLaunches}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
+        ListFooterComponent={() =>
+          loading ? <ActivityIndicator size="large" color="#809fff" animating />
+                  : null
+          }
       />
     </SafeAreaView>
     </>
   )
 }
-
-
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    // marginTop: 32,
-    // marginBottom: 20,
-    // paddingHorizontal: 24,
-  },
-image: {
-    width: 50,
-    height: 50
-},
-  title: {
-    fontWeight: '700',
-    fontSize: 20,
-  },
-  first: {
-    fontSize: 18,
-    fontWeight: '300',
-    marginBottom: 5,
-    marginTop: -5,
-  },
-  second: {
-    fontSize: 16,
-    fontWeight: '200',
-  },
-  starIcon: {
-    color: "#fcba03",
-    alignSelf: "flex-end",
-    marginRight: 6,
-    marginBottom: -10,
-    marginTop: 8,
-  },
-  successGreen: {
-    alignSelf: "flex-end",
-    marginRight: 10,
-    fontWeight: '700',
-    fontSize: 18,
-    color: 'green',
-    marginTop: -12,
-    marginBottom: -8
-  },
-  successRed: {
-    alignSelf: "flex-end",
-    marginRight: 10,
-    fontWeight: '700',
-    fontSize: 18,
-    color: 'red',
-    marginTop: -12,
-    marginBottom: -8
-  },
-  successMid: {
-    alignSelf: "flex-end",
-    marginRight: 10,
-    fontWeight: '700',
-    fontSize: 18,
-    color: 'orange',
-    marginTop: -12,
-    marginBottom: -8
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 10
-  },
-
-});
 
 
 export default Favorites;

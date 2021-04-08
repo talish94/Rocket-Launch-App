@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { WebView } from 'react-native-webview';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
 const Browser = ({ route }) => {
 
     const { url } = route.params;
+    console.log(url);
 
     return (
         <>
@@ -12,7 +13,6 @@ const Browser = ({ route }) => {
         <WebView
             source={{ uri: url }}
             style={{ marginTop: 0, marginLeft: -95, height: 300 , width: '150%', flex: 1 }}
-            // startInLoadingState={true}
             />
             </View>
         </>

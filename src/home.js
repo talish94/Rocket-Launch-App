@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, SafeAreaView, FlatList, Text, View, Image, StyleSheet} from 'react-native';
-import { ListItem, Avatar } from 'react-native-elements'
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { ActivityIndicator, SafeAreaView, FlatList, Image, StyleSheet} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LaunchItem from '../src/components/launchItem';
+
+import { Searchbar } from 'react-native-paper';
+
 
 const HomeScreen = () => {
 
@@ -15,249 +16,207 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [launches, setLaunches] = useState([]);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const onChangeSearch = query => setSearchQuery(query);
+
+
+  // this function calls only on the first time ( ~componentDidMount )
   useEffect(() => {
 
     const fetchData = async () => {
 
+     let mounted = true;
      setLoading(true);
-     const response = await fetch(
-       'https://lldev.thespacedevs.com/2.2.0/launch/?mode=list?limit=10&offset=0',
-     );
-     const json = await response.json();
-  
-     setData(json.results);
-     setNextUrl(json.next);
-     setLoading(false);
-   };
 
-   const refresh = setInterval(getAllKeys, 2000);
+      const response = await fetch(
+        'https://lldev.thespacedevs.com/2.2.0/launch/?mode=list?limit=10&offset=0',
+      );
+      const json = await response.json();
+    
+      setData(json.results);
+      setNextUrl(json.next);
+      setLoading(false);
+      
+    };
 
+   getAllLaunches();
    fetchData();
-   //console.log("enddd" + launches.length);
+   return () => mounted = false;
 
  }, []);
 
 
-   const getAllKeys = async () => {
+// this function calls every time the dependency changes (favoriteLaunches). ~componentDidUpdate
+ useEffect(() => {
+    getAllLaunches();
 
-    // await AsyncStorage.clear();
+}, [launches]);
+
+
+  // this function gets all the keys from the asyncStorage, to load the favorites launches to display
+  const getAllLaunches = async () => {
 
     let launchesIds = [];
     let launchObject = null;
     let allLaunchesObjects = [];
+ 
+      try {
+        launchesIds = await AsyncStorage.getAllKeys();
 
-     try {
-      launchesIds = await AsyncStorage.getAllKeys();
-
-        for (let id of launchesIds) {
-          launchObject = await getData(id);
-          allLaunchesObjects.push(launchObject);
-        }
-     
-      setLaunches(allLaunchesObjects);
-      // setLoading(false);
-
-
-    } catch(e) {
-      // read key error
-      console.log("eroorrrr");
-    }
+          for (let id of launchesIds) {
+            launchObject = await getData(id);
+            allLaunchesObjects.push(launchObject);
+          }
+      
+        setLaunches(allLaunchesObjects);      
+    
+      } catch(e) {
+        // read key error
+        console.log("eroorrrr");
+      }    
   };
 
 
-
-
+  // gets the next 10 luanches from the API
   const fetchMoreData = async () => {
     setLoading(true);
     const response = await fetch( nextUrl );
     const json = await response.json();
-    // console.log(json.next);
 
     setData(data.concat(json.results));
     setNextUrl(json.next);
     setLoading(false);
-
   };
-
-  const openWebView = (item) => {
-    console.log('Navigation router run...');
-
-    const title = item.name;
-
-    const infoUrl = item.pad.info_url;
-    if ( infoUrl != null )
-      return { title, infoUrl };
-
-    // if ( )
-    const link = "www.google.com";
-    // this.props.navigation.navigate('Browser', { title , link });
-  };
-
-
-  // const storeData = async (launch) => {
-  //   try {
-  //     const jsonLaunch = JSON.stringify(launch);
-  //     await AsyncStorage.setItem(launch.id, jsonLaunch);
-  //     console.log("launch was saved to store :: " + launch.name);
-  //   } catch (e) {
-  //     // saving error
-  //     alert("There was an error saving this launch to your favourites.");
-  //   }
-  // }
 
   
-
-
-
+// gets the whole information about the launch, by the given ID
 const getData = async (launchKey) => {
   try {
     const jsonValue = await AsyncStorage.getItem(launchKey);
 
     return jsonValue != null ? JSON.parse(jsonValue) : null;
 
-  } catch(e) {
-    // error reading value
+  } catch(error) {
+    console.log(error);
   }
 }
 
 
-
-
-  // const Item = ({ item, onPress }) => (
-
-  //   <ListItem key={item.id} bottomDivider button onPress={onPress}>
-  //               {
-  //                   item.image != null
-  //                   ?  <Avatar style={styles.image} source={{uri: item.image}} />
-  //                   :  <Avatar style={styles.image} source={require('../src/assets/launch.jpg')} />
-  //               }
-  //                   <ListItem.Content>
-  //                   <ListItem.Title style={styles.title} >{item.name}</ListItem.Title>
-  //                   <Icon style={styles.starIcon} name="star-outline" size={26} 
-  //                    button onPress={() => {storeData(item)}} />
-    
-  //                   <ListItem.Subtitle style={styles.first}>{item.pad.location.country_code}</ListItem.Subtitle>
-  //                   <ListItem.Subtitle style={styles.second}>{item.window_start.substring(0, item.window_start.indexOf("T"))}</ListItem.Subtitle>
-    
-  //                   { item.status.abbrev === "Success" &&
-  //                       <ListItem.Subtitle style={styles.successGreen} >
-  //                           {item.status.abbrev}
-  //                       </ListItem.Subtitle>
-  //                   }
-  //                   { item.status.abbrev === "Failure" &&
-  //                       <ListItem.Subtitle style={styles.successRed} >
-  //                           {item.status.abbrev}
-  //                       </ListItem.Subtitle>
-  //                   }
-  //                     { item.status.abbrev === "Partial Failure" &&
-  //                       <ListItem.Subtitle style={styles.successMid} >
-  //                           {item.status.abbrev}
-  //                       </ListItem.Subtitle>
-  //                   }
-  //                   </ListItem.Content>
-  //           </ListItem>
-  // );
-
-
   const renderItem = ({ item }) => {
 
-    const itemFound = launches.find( launch => launch.id === item.id );
-    const isFavorite = itemFound != null;
-    //console.log(isFavorite);
+    let infoUrl = null; 
 
-    return (
-      <LaunchItem item={item} isFavorite={isFavorite}/>
-    );
+    if (item !== null) {
+
+      let isFavorite = false;
+
+      // checks whether it is a favorite launch or not - to display the correct icon.
+      if ( launches.length > 0 ){
+        const itemFound = launches.find( launch => launch.id === item.id );
+        isFavorite = itemFound != null;
+      }
+
+      // gets the Wiki page url for the Webview
+      infoUrl = item.program.wiki_url;
+
+      if ( infoUrl === "" ){
+          infoUrl = item.pad.wiki_url; // second option to get a wiki url
+      }
+
+      return (
+        <LaunchItem launch={item} isFavorite={isFavorite} navigation={navigation} url={infoUrl} launchesListUpdated={launchesListUpdated}/>
+        );
+    }
+  };
+
+
+  // gets updated list of favorite launches from the child component
+  const launchesListUpdated = ( newLaunches ) => {
+    console.log ( newLaunches.length );
+    setLaunches(newLaunches);
+  }
+
+  const search = async() => {
+
+      try{
+
+          const response = await fetch(
+          `https://lldev.thespacedevs.com/2.2.0/launch/?search=${searchQuery}`,
+          );
+
+          return await response.json();
+      }
+
+      catch(error){
+          console.log(error);
+      }
+  }
+  
+  // calls when user press on sucmit search
+  const handleKeyDown = async() => {
+
+      if (searchQuery.length > 0) {
+        setLoading(true);
+
+        try {
+          const searchResults = await search();
+
+          setData(searchResults.results);
+          setNextUrl(searchResults.next);
+          setLoading(false);
+        }
+
+        catch(e){
+            console.log(e);
+        }
+      }
   };
 
 
   return (
     <>
     { data  &&
-        <SafeAreaView style={styles.container}>
+      <>
+        <Searchbar
+        placeholder="Search"
+        onChangeText={onChangeSearch}
+        value={searchQuery}
+        onIconPress={handleKeyDown}
+        />
 
+        { !loading && data.length == 0 &&
+         <Image
+            source={require('../src/assets/noResults.png')}
+            fadeDuration={0}
+            style={styles.noFoundImg}
+          />
+        }
+
+        <SafeAreaView style={styles.container}>
+         
           <FlatList
                   contentContainerStyle={styles.sectionContainer}
                   data={data}
                   renderItem={renderItem}
                   keyExtractor={(item) => item.id}
                   onEndReached={fetchMoreData}
-                  onEndReachedThreshold={0.1}            
-                  initialNumToRender={10}
+                  onEndReachedThreshold={0.5}            
+                  // initialNumToRender={10}
                   ListFooterComponent={() =>
                       loading ? <ActivityIndicator size="large" color="#809fff" animating />
                               : null
                       }
                 />
         </SafeAreaView>
+        </>
         }
       </>
     );
 }
 
-export default HomeScreen;
-
-
 
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    // marginTop: 32,
-    // marginBottom: 20,
-    // paddingHorizontal: 24,
-  },
-image: {
-    width: 50,
-    height: 50
-},
-  title: {
-    fontWeight: '700',
-    fontSize: 20,
-  },
-  first: {
-    fontSize: 18,
-    fontWeight: '300',
-    marginBottom: 5,
-    marginTop: -5,
-  },
-  second: {
-    fontSize: 16,
-    fontWeight: '200',
-  },
-  starIcon: {
-    color: "#fcba03",
-    alignSelf: "flex-end",
-    marginRight: 6,
-    marginBottom: -10,
-    marginTop: 8,
-  },
-  successGreen: {
-    alignSelf: "flex-end",
-    marginRight: 10,
-    fontWeight: '700',
-    fontSize: 18,
-    color: 'green',
-    marginTop: -12,
-    marginBottom: -8
-  },
-  successRed: {
-    alignSelf: "flex-end",
-    marginRight: 10,
-    fontWeight: '700',
-    fontSize: 18,
-    color: 'red',
-    marginTop: -12,
-    marginBottom: -8
-  },
-  successMid: {
-    alignSelf: "flex-end",
-    marginRight: 10,
-    fontWeight: '700',
-    fontSize: 18,
-    color: 'orange',
-    marginTop: -12,
-    marginBottom: -8
-  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -265,5 +224,17 @@ image: {
     justifyContent: "space-around",
     padding: 10
   },
-
+  searchBar: {
+    width: 400,
+    height: 70, 
+  },
+  noFoundImg: {
+    width: 370,
+    height: 140,
+    alignContent: 'center',
+    marginLeft: 10,
+    marginTop: 90
+  }
 });
+
+export default HomeScreen;
