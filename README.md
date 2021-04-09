@@ -66,7 +66,7 @@ complicated and I decided to implement it differnetly.
 
 Hope you'll like it :)
 
-Attached some app asreens:
+Attached some app screens:
 
 ![WhatsApp Image 2021-04-08 at 20 04 25](https://user-images.githubusercontent.com/49098945/114072325-d2987080-98aa-11eb-9b68-c2f46f39a7e5.jpeg)
 ![WhatsApp Image 2021-04-08 at 20 04 48](https://user-images.githubusercontent.com/49098945/114072332-d62bf780-98aa-11eb-9de7-e64fe1b97db9.jpeg)
